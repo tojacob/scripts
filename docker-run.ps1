@@ -10,7 +10,7 @@ param(
   $execute,
   [string]
   [Parameter(
-    HelpMessage= "Enter the ports (in string format separate for an space) to run in the container. For example: `"3000:3000 8080:8080`"",
+    HelpMessage= "Enter the ports (in string format separate for an space) to set in the container. For example: `"3000:3000 8080:8080`"",
     Position=1
   )]
   [ValidateNotNullOrEmpty()]
