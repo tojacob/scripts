@@ -1,18 +1,21 @@
 [CmdletBinding(PositionalBinding=$false)]
-
 param(
   [string]
   [Parameter(
     Mandatory=$true,
-    HelpMessage= "Enter the command and arguments (in string format) to run in the container. For example: `"npm install`"",
+    HelpMessage= "Enter the command and arguments (in string format separate for an space) to run in the container. For example: `"npm install`"",
     Position=0
   )]
   [alias("e")] 
   $execute,
   [string]
+  [Parameter(
+    HelpMessage= "Enter the ports (in string format separate for an space) to run in the container. For example: `"3000:3000 8080:8080`"",
+    Position=1
+  )]
   [ValidateNotNullOrEmpty()]
   [alias("p")] 
-  $publishPorts = "8000:8000",
+  $publishPorts = "3000:3000",
   [string]
   [ValidateNotNullOrEmpty()]
   [alias("v")] 
@@ -27,11 +30,20 @@ param(
   $imageName = "node:12.13.1-alpine3.10"
 );
 
+# Format port list
+[array] $publishPortsWithFormat = $publishPorts.split(" ");
+
+for ($i=0; $i -lt $publishPortsWithFormat.length; $i++) {
+  $publishPortsWithFormat[$i] = "-p=" + $publishPortsWithFormat[$i];
+}
+
+# Get command and arguments to run
 $exec = $execute.split(" ");
 $command, $arguments = $exec;
 
+# Run the container 
 docker run --interactive --tty --rm `
-  --publish $publishPorts `
+  $publishPortsWithFormat `
   --volume $volumePaths `
   --workdir $workdirPath `
   $imageName $command $arguments
@@ -55,4 +67,10 @@ REFERENCES
 
   Escaping in powershell:
   http://www.rlmueller.net/PowerShellEscape.htm
+
+  Array list (array add method):
+  https://mcpmag.com/articles/2019/04/10/managing-arrays-in-powershell.aspx
+
+  Loop array:
+  https://powertoe.wordpress.com/2009/12/14/powershell-part-4-arrays-and-for-loops/
 #>
